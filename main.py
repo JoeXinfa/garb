@@ -13,9 +13,15 @@ import pandas as pd
 import qtawesome as qta
 from qtpy.compat import getopenfilename, getsavefilename
 from qtpy.QtCore import Qt, QRegExp, QDate
-from qtpy.QtGui import QRegExpValidator
+from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
     QLabel, QLineEdit, QComboBox, QDialog, QCalendarWidget)
+
+from qtpy import PYQT5
+if PYQT5:
+    APP_ICON = QIcon("images/shuttlecock.svg")
+else:
+    APP_ICON = QIcon("images/shuttlecock.png")
 
 
 class ScoreBoard(QDialog):
@@ -24,6 +30,7 @@ class ScoreBoard(QDialog):
     def __init__(self, path=None):
         QDialog.__init__(self)
         self.setWindowTitle(self.NAME)
+        self.setWindowIcon(APP_ICON)
         if path is None:
             path = os.getcwd()
         self.path = path
