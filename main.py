@@ -15,12 +15,12 @@ from qtpy.compat import getopenfilename, getsavefilename
 from qtpy.QtCore import Qt, QRegExp
 from qtpy.QtGui import QRegExpValidator
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
-    QLabel, QLineEdit)
+    QLabel, QLineEdit, QComboBox, QDialog)
 
 
-class ScoreBoard(QWidget):
+class ScoreBoard(QDialog):
     def __init__(self, path=None):
-        QWidget.__init__(self)
+        QDialog.__init__(self)
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -38,9 +38,13 @@ class ScoreBoard(QWidget):
         fn = self.loader.lineedit.edit.text()
         self.players = pd.read_csv(fn)
         print(self.players)
+        
+        players = list(self.players.Name)
+        self.tap1.combobox.addItems(players)
 
     def setup_page(self):
         self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
         
         text = "Load players"
         self.loader = self.create_browsefile(text)
@@ -48,9 +52,36 @@ class ScoreBoard(QWidget):
             self.loader.lineedit.edit.setText(self.path)
         self.layout.addWidget(self.loader)
 
+        text = "Player 1"
+        self.tap1 = self.create_combobox(text)
+        self.layout.addWidget(self.tap1)
+
     def save_file(self):
         pass
-
+    
+    def create_combobox(self, text, choices=None, tip=None, restart=False):
+        """choices: couples (name, key)"""
+        label = QLabel(text)
+        combobox = QComboBox()
+        # combobox.setMinimumContentsLength(10)
+        combobox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        if tip is not None:
+            combobox.setToolTip(tip)
+        # for name, key in choices:
+        #     if not (name is None and key is None):
+        #         combobox.addItem(name, to_qvariant(key))
+        # Insert separators
+        layout = QHBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(combobox)
+        layout.addStretch(1)
+        layout.setContentsMargins(0, 0, 0, 0)
+        widget = QWidget(self)
+        widget.label = label
+        widget.combobox = combobox
+        widget.setLayout(layout)
+        return widget    
+    
     def create_browsefile(self, text, default=None, tip=None,
                           filters=None, new=False):
         widget = self.create_lineedit(text, default=default, tip=tip)
