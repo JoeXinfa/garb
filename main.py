@@ -12,15 +12,18 @@ import os.path as osp
 import pandas as pd
 import qtawesome as qta
 from qtpy.compat import getopenfilename, getsavefilename
-from qtpy.QtCore import Qt, QRegExp
+from qtpy.QtCore import Qt, QRegExp, QDate
 from qtpy.QtGui import QRegExpValidator
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
-    QLabel, QLineEdit, QComboBox, QDialog)
+    QLabel, QLineEdit, QComboBox, QDialog, QCalendarWidget)
 
 
 class ScoreBoard(QDialog):
+    NAME = "League Scoreboard - 谁羽争锋"
+
     def __init__(self, path=None):
         QDialog.__init__(self)
+        self.setWindowTitle(self.NAME)
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -41,6 +44,9 @@ class ScoreBoard(QDialog):
         
         players = list(self.players.Name)
         self.tap1.combobox.addItems(players)
+        self.tap2.combobox.addItems(players)
+        self.tbp1.combobox.addItems(players)
+        self.tbp2.combobox.addItems(players)
 
     def setup_page(self):
         self.layout = QVBoxLayout()
@@ -52,13 +58,58 @@ class ScoreBoard(QDialog):
             self.loader.lineedit.edit.setText(self.path)
         self.layout.addWidget(self.loader)
 
-        text = "Player 1"
-        self.tap1 = self.create_combobox(text)
-        self.layout.addWidget(self.tap1)
+        board = self.create_board()
+        self.layout.addWidget(board)
+        
+        calendar = self.create_calendar()
+        self.layout.addWidget(calendar)
 
     def save_file(self):
         pass
-    
+
+    def create_calendar(self):
+        cal = QCalendarWidget(self)
+        cal.setGridVisible(True)
+        cal.clicked[QDate].connect(self.insert_date)
+        return cal
+		
+    def insert_date(self, date):
+        self.date.edit.setText(date.toString())
+
+    def create_board(self):
+        game  = QLabel("Game      ")
+        teama = QLabel("Team A    ")
+        teamb = QLabel("Team B    ")
+        self.date = self.create_lineedit("Date")
+        self.seqno = self.create_lineedit("Seqno")
+        self.tas = self.create_lineedit("Score")
+        self.tbs = self.create_lineedit("Score")
+        self.tap1 = self.create_combobox("Player 1")
+        self.tap2 = self.create_combobox("Player 2")
+        self.tbp1 = self.create_combobox("Player 1")
+        self.tbp2 = self.create_combobox("Player 2")
+        hboxg = QHBoxLayout()
+        hboxg.addWidget(game)
+        hboxg.addWidget(self.date)
+        hboxg.addWidget(self.seqno)
+        hboxa = QHBoxLayout()
+        hboxa.addWidget(teama)
+        hboxa.addWidget(self.tap1)
+        hboxa.addWidget(self.tap2)
+        hboxa.addWidget(self.tas)
+        hboxb = QHBoxLayout()
+        hboxb.addWidget(teamb)
+        hboxb.addWidget(self.tbp1)
+        hboxb.addWidget(self.tbp2)
+        hboxb.addWidget(self.tbs)
+        layout = QVBoxLayout()
+        layout.addLayout(hboxg)
+        layout.addLayout(hboxa)
+        layout.addLayout(hboxb)
+        board = QWidget(self)
+        board.setLayout(layout)
+        return board
+   
     def create_combobox(self, text, choices=None, tip=None, restart=False):
         """choices: couples (name, key)"""
         label = QLabel(text)
