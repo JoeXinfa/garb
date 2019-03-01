@@ -47,6 +47,7 @@ class ScoreBoard(QDialog):
 
     def load_data(self):
         fn = self.loader.lineedit.edit.text()
+        self.path = osp.dirname(fn)
         self.players = pd.read_csv(fn)
         print(self.players)
         
@@ -71,9 +72,6 @@ class ScoreBoard(QDialog):
         
         calendar = self.create_calendar()
         self.layout.addWidget(calendar)
-
-    def save_file(self):
-        pass
 
     def create_calendar(self):
         cal = QCalendarWidget(self)
@@ -101,9 +99,15 @@ class ScoreBoard(QDialog):
         key = game["date"] + ", " + str(game["seqno"])
         self.games[key] = game
         print(key, self.games[key])
-        # todo save game to games file
+        self.save_games_to_file()
         # todo update games list view
         # todo update players rank view
+
+    def save_games_to_file(self):
+        fn = "games.csv"
+        fn = osp.join(self.path, fn)
+        df = pd.DataFrame.from_dict(self.games, orient='index')
+        df.to_csv(fn, index = False)
 
     def create_board(self):
         game  = QLabel("Game ID   ")
