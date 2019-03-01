@@ -31,6 +31,7 @@ class ScoreBoard(QDialog):
         QDialog.__init__(self)
         self.setWindowTitle(self.NAME)
         self.setWindowIcon(APP_ICON)
+        self.games = {}
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -81,16 +82,31 @@ class ScoreBoard(QDialog):
         return cal
 		
     def insert_date(self, date):
+        self.cal_date = date
         self.date.edit.setText(date.toString())
 
     def load_game_to_board(self):
         pass
 
     def save_board_to_game(self):
-        pass
+        game = {}
+        game["date"] = self.cal_date.toString('MMMM d, yyyy')
+        game["seqno"] = int(self.seqno.edit.text())
+        game["tap1"] = self.tap1.combobox.currentText()
+        game["tap2"] = self.tap2.combobox.currentText()
+        game["tbp1"] = self.tbp1.combobox.currentText()
+        game["tbp2"] = self.tbp2.combobox.currentText()
+        game["tas"] = int(self.tas.edit.text())
+        game["tbs"] = int(self.tbs.edit.text())
+        key = game["date"] + ", " + str(game["seqno"])
+        self.games[key] = game
+        print(key, self.games[key])
+        # todo save game to games file
+        # todo update games list view
+        # todo update players rank view
 
     def create_board(self):
-        game  = QLabel("Game      ")
+        game  = QLabel("Game ID   ")
         teama = QLabel("Team A    ")
         teamb = QLabel("Team B    ")
         self.date = self.create_lineedit("Date")
