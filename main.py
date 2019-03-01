@@ -9,9 +9,9 @@ __version__ = '0.1.0'
 import os
 import os.path as osp
 
-
+import pandas as pd
 import qtawesome as qta
-from qtpy.compat import getexistingdirectory
+from qtpy.compat import getopenfilename, getsavefilename
 from qtpy.QtCore import Qt, QRegExp
 from qtpy.QtGui import QRegExpValidator
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
@@ -24,44 +24,48 @@ class ScoreBoard(QWidget):
         if path is None:
             path = os.getcwd()
         self.path = path
-        self.load_data()
         self.setup_page()
 
     @property
     def path(self):
         return self._path
-    
+
     @path.setter
     def path(self, value):
         self._path = value
 
     def load_data(self):
-        pass
+        fn = self.loader.lineedit.edit.text()
+        self.players = pd.read_csv(fn)
+        print(self.players)
 
     def setup_page(self):
         self.layout = QVBoxLayout()
         
-        text = "Data folder"
-        self.select_dir = self.create_browsedir(text)
-        self.layout.addWidget(self.select_dir)
+        text = "Load players"
+        self.loader = self.create_browsefile(text)
+        if self.path is not None:
+            self.loader.lineedit.edit.setText(self.path)
+        self.layout.addWidget(self.loader)
 
     def save_file(self):
         pass
 
-    def create_browsedir(self, text, default=None, tip=None):
+    def create_browsefile(self, text, default=None, tip=None,
+                          filters=None, new=False):
         widget = self.create_lineedit(text, default=default, tip=tip)
         edit = widget.edit
-        browse_btn = QPushButton(icon('DirOpenIcon'), '', self)
-        browse_btn.setToolTip("Select directory")
-        browse_btn.clicked.connect(lambda: self.select_directory(edit))
+        browse_btn = QPushButton(icon('FileIcon'), '', self)
+        browse_btn.setToolTip("Select file")
+        browse_btn.clicked.connect(lambda: self.select_file(edit, filters, new))
         layout = QHBoxLayout()
         layout.addWidget(widget)
         layout.addWidget(browse_btn)
         layout.setContentsMargins(0, 0, 0, 0)
-        browsedir = QWidget(self)
-        browsedir.lineedit = widget
-        browsedir.setLayout(layout)
-        return browsedir
+        browsefile = QWidget(self)
+        browsefile.lineedit = widget
+        browsefile.setLayout(layout)
+        return browsefile
 
     def create_lineedit(self, text, default=None, tip=None,
                         alignment=Qt.Horizontal, regex=None, wrap=True):
@@ -84,15 +88,29 @@ class ScoreBoard(QWidget):
         widget.setLayout(layout)
         return widget
 
-    def select_directory(self, edit):
-        basedir = edit.text()
-        if not osp.isdir(basedir):
-            basedir = os.getcwd()
-        title = "Select directory"
-        directory = getexistingdirectory(self, title, basedir)
-        if directory:
-            edit.setText(directory)
-            self.path = directory
+    def select_file(self, edit, filters=None, new=False):
+        """
+        -i- edit : QLineEdit, for display the selected file.
+        -i- filters : String, filter in the browse-file dialog.
+        -i- new : boolean, select existing or create new file.
+        """
+        initdir = edit.text()
+        if osp.isdir(initdir):
+            basedir = initdir
+        else:
+            basedir = osp.dirname(initdir)
+            if not osp.isdir(basedir):
+                basedir = os.getcwd()
+        if filters is None:
+            filters = "All files (*)"
+        title = "Select file"
+        if new:
+            filename, _selfilter = getsavefilename(self, title, basedir, filters)
+        else:
+            filename, _selfilter = getopenfilename(self, title, basedir, filters)
+        if filename:
+            edit.setText(filename)
+            self.load_data()
 
 
 _resource = {
@@ -101,7 +119,7 @@ _resource = {
 }
 
 _qtaargs = {
-    'DirOpenIcon':  [('fa.folder-open',), {}],
+    'FileIcon': [('fa.file-o',), {}],
 }
 
 def icon(name, resample=False, icon_path=None):
