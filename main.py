@@ -83,6 +83,12 @@ class ScoreBoard(QDialog):
     def insert_date(self, date):
         self.date.edit.setText(date.toString())
 
+    def load_game_to_board(self):
+        pass
+
+    def save_board_to_game(self):
+        pass
+
     def create_board(self):
         game  = QLabel("Game      ")
         teama = QLabel("Team A    ")
@@ -95,24 +101,34 @@ class ScoreBoard(QDialog):
         self.tap2 = self.create_combobox("Player 2")
         self.tbp1 = self.create_combobox("Player 1")
         self.tbp2 = self.create_combobox("Player 2")
-        hboxg = QHBoxLayout()
-        hboxg.addWidget(game)
-        hboxg.addWidget(self.date)
-        hboxg.addWidget(self.seqno)
-        hboxa = QHBoxLayout()
-        hboxa.addWidget(teama)
-        hboxa.addWidget(self.tap1)
-        hboxa.addWidget(self.tap2)
-        hboxa.addWidget(self.tas)
-        hboxb = QHBoxLayout()
-        hboxb.addWidget(teamb)
-        hboxb.addWidget(self.tbp1)
-        hboxb.addWidget(self.tbp2)
-        hboxb.addWidget(self.tbs)
+        btn_load = QPushButton("Load")
+        btn_load.clicked.connect(self.load_game_to_board)
+        btn_save = QPushButton("Save")
+        btn_save.clicked.connect(self.save_board_to_game)
+        
         layout = QVBoxLayout()
-        layout.addLayout(hboxg)
-        layout.addLayout(hboxa)
-        layout.addLayout(hboxb)
+        hbox = QHBoxLayout()
+        hbox.addWidget(game)
+        hbox.addWidget(self.date)
+        hbox.addWidget(self.seqno)
+        layout.addLayout(hbox)
+        hbox = QHBoxLayout()
+        hbox.addWidget(teama)
+        hbox.addWidget(self.tap1)
+        hbox.addWidget(self.tap2)
+        hbox.addWidget(self.tas)
+        layout.addLayout(hbox)
+        hbox = QHBoxLayout()
+        hbox.addWidget(teamb)
+        hbox.addWidget(self.tbp1)
+        hbox.addWidget(self.tbp2)
+        hbox.addWidget(self.tbs)
+        layout.addLayout(hbox)
+        hbox = QHBoxLayout()
+        hbox.addWidget(btn_load)
+        hbox.addWidget(btn_save)
+        layout.addLayout(hbox)
+        
         board = QWidget(self)
         board.setLayout(layout)
         return board
