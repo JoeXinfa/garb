@@ -69,6 +69,7 @@ class ScoreBoard(QWidget):
         self.display_games()        
 
     def setup_page(self):
+        width, height = 1500, 500
         board = self.create_page_board()
         self.games_tbl = self.create_page_game()
         self.ranks_tbl = self.create_page_rank()
@@ -77,11 +78,13 @@ class ScoreBoard(QWidget):
         splt.addWidget(self.games_tbl)
         splt.addWidget(board)
         splt.addWidget(self.ranks_tbl)
-        splt.setSizes([300, 100, 300])
+        splt.setSizes([700, 300, 500])
 
         layout = QVBoxLayout()
         layout.addWidget(splt)
         self.setLayout(layout)
+        
+        self.resize(width, height)
 
     def create_page_board(self):
         layout = QVBoxLayout()
@@ -234,7 +237,7 @@ class ScoreBoard(QWidget):
         """choices: couples (name, key)"""
         label = QLabel(text)
         combobox = QComboBox()
-        # combobox.setMinimumContentsLength(10)
+        combobox.setMinimumContentsLength(12)
         combobox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         if tip is not None:
             combobox.setToolTip(tip)
