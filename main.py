@@ -8,7 +8,7 @@ __version__ = '0.1.0'
 
 import os
 import os.path as osp
-
+import numpy as np
 import pandas as pd
 import qtawesome as qta
 from qtpy.compat import getopenfilename, getsavefilename
@@ -26,6 +26,7 @@ else:
 
 
 GAME_LIST = ['Date', 'Seq', 'TAP1', 'TAP2', 'TBP1', 'TBP2', 'TAS', 'TBS']
+RANK_LIST = ['Player', 'Games', 'Points', 'PPG', 'Bonus', 'GPA']
 
 class ScoreBoard(QWidget):
     NAME = "League Scoreboard - 谁羽争锋"
@@ -35,6 +36,7 @@ class ScoreBoard(QWidget):
         self.setWindowTitle(self.NAME)
         self.setWindowIcon(APP_ICON)
         self.games = None # pandas dataframe
+        self.ranks = None # pandas dataframe
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -66,7 +68,8 @@ class ScoreBoard(QWidget):
         
         # load games and update games table
         self.load_games_from_file()
-        self.display_games()        
+        self.display_games()
+        self.update_ranks()
 
     def setup_page(self):
         width, height = 1500, 500
@@ -101,26 +104,24 @@ class ScoreBoard(QWidget):
         return widget
         
     def create_page_game(self):
-        cols = ["Date", "NO", "TAP1", "TAP2", "TBP1", "TBP2", "TAS", "TBS"]
         widget = QTableWidget()
         widget.setSortingEnabled(True)
         widget.setRowCount(1000)
-        widget.setColumnCount(len(cols))
-        widget.setHorizontalHeaderLabels(cols)
+        widget.setColumnCount(len(GAME_LIST))
+        widget.setHorizontalHeaderLabels(GAME_LIST)
         header = widget.horizontalHeader()
-        for i in range(len(cols)):
+        for i in range(len(GAME_LIST)):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         return widget
 
     def create_page_rank(self):
-        cols = ["Player", "Games", "Points", "PPG", "Bonus", "GPA"]
         widget = QTableWidget()
         widget.setSortingEnabled(True)
         widget.setRowCount(20)
-        widget.setColumnCount(len(cols))
-        widget.setHorizontalHeaderLabels(cols)
+        widget.setColumnCount(len(RANK_LIST))
+        widget.setHorizontalHeaderLabels(RANK_LIST)
         header = widget.horizontalHeader()
-        for i in range(len(cols)):
+        for i in range(len(RANK_LIST)):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         return widget
 
@@ -164,14 +165,73 @@ class ScoreBoard(QWidget):
         # load games and update games table
         self.load_games_from_file()
         self.display_games()
+        # TODO reset all cells or just the one game?
         
-        # todo update players rank view
+        self.update_ranks()
+
+    def update_ranks(self):
+        index = list(self.players.Name)
+        index.remove('None')
+        columns = RANK_LIST[1:]
+        nrow, ncol = len(index), len(columns)
+        data = np.zeros((nrow, ncol))
+        self.ranks = pd.DataFrame(data, index=index, columns=columns)
+
+        # Count number of games and points
+        for index, row in self.games.iterrows():
+            if row['TAS'] > row['TBS']:
+                pointa, pointb = 2, 1
+            else:
+                pointa, pointb = 1, 2
+            tap1 = row['TAP1']
+            tap2 = row['TAP2']
+            tbp1 = row['TBP1']
+            tbp2 = row['TBP2']
+            self.ranks.loc[tap1].loc['Games'] += 1
+            self.ranks.loc[tap2].loc['Games'] += 1
+            self.ranks.loc[tbp1].loc['Games'] += 1
+            self.ranks.loc[tbp2].loc['Games'] += 1
+            self.ranks.loc[tap1].loc['Points'] += pointa
+            self.ranks.loc[tap2].loc['Points'] += pointa
+            self.ranks.loc[tbp1].loc['Points'] += pointb
+            self.ranks.loc[tbp2].loc['Points'] += pointb
+
+        # Calculate PPG, Bonus, and GPA
+        for index, row in self.ranks.iterrows():
+            if row['Games'] == 0:
+                row['PPG'] = 0
+            else:
+                row['PPG'] = row['Points'] / row['Games']
+            row['Bonus'] = row['Games'] * 0.01
+            row['GPA'] = row['PPG'] + row['Bonus']
+
+        # Refresh display
+        self.display_ranks()
+
+    def display_ranks(self):
+        if self.ranks is None:
+            return
+        nrow, ncol = self.ranks.shape
+        irow = 0
+        for index, row in self.ranks.iterrows():
+            pcell = QTableWidgetItem()
+            pcell.setText(index)
+            self.ranks_tbl.setItem(irow, 0, pcell)
+            for icol in range(ncol):
+                val = row.iloc[icol]
+                if icol in [0, 1]:
+                    val = str(int(val))
+                else:
+                    val = "{0:.3f}".format(val)
+                cell = QTableWidgetItem()
+                cell.setText(val)
+                self.ranks_tbl.setItem(irow, icol+1, cell)
+            irow += 1
 
     def display_games(self):
         if self.games is None:
             return
         nrow, ncol = self.games.shape
-        # todo column width adjust with content
         for row in range(nrow):
             for col in range(ncol):
                 val = self.games.iloc[row].iloc[col]
