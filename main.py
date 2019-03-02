@@ -16,7 +16,7 @@ from qtpy.QtCore import Qt, QRegExp, QDate, QVariant
 from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
     QLabel, QLineEdit, QComboBox, QCalendarWidget, QTableWidget,
-    QTableWidgetItem, QSplitter)
+    QTableWidgetItem, QSplitter, QHeaderView)
 
 from qtpy import PYQT5
 if PYQT5:
@@ -96,17 +96,27 @@ class ScoreBoard(QWidget):
         return widget
         
     def create_page_game(self):
+        cols = ["Date", "NO", "TAP1", "TAP2", "TBP1", "TBP2", "TAS", "TBS"]
         widget = QTableWidget()
         widget.setSortingEnabled(True)
         widget.setRowCount(1000)
-        widget.setColumnCount(8)
+        widget.setColumnCount(len(cols))
+        widget.setHorizontalHeaderLabels(cols)
+        header = widget.horizontalHeader()
+        for i in range(len(cols)):
+            header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         return widget
 
     def create_page_rank(self):
+        cols = ["Player", "Games", "Points", "PPG", "Bonus", "GPA"]
         widget = QTableWidget()
         widget.setSortingEnabled(True)
         widget.setRowCount(20)
-        widget.setColumnCount(7)
+        widget.setColumnCount(len(cols))
+        widget.setHorizontalHeaderLabels(cols)
+        header = widget.horizontalHeader()
+        for i in range(len(cols)):
+            header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
         return widget
 
     def create_calendar(self):
