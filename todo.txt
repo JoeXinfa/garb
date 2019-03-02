@@ -1,0 +1,28 @@
+ranks table, one click to sort by descending (not ascending)
+
+use anonymous names, commit test data
+
+take demo snapshot, commit
+
+add readme, why make this, 1) efficient 2) less error than excel
+
+share code with Will and Xuepei
+
+Change name Yang Li to Will Li, add column of Chinese names
+
+save game, add or modify only that entry, rather than refill the whole table
+test speed, make it faster
+
+Add a plot or pie chart for games, points, etc. in the ranks table
+
+save ranks to ranks.csv
+
+User can directly type in the games table to add, edit, save file, rank refresh
+
+Ranks in a period of time or by month
+
+Make ranks table cell not user editable, only update by program
+
+Make a web-based app, user can use from web browser via internet
+
+Jim Li suggestions
