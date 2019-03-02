@@ -12,7 +12,7 @@ import os.path as osp
 import pandas as pd
 import qtawesome as qta
 from qtpy.compat import getopenfilename, getsavefilename
-from qtpy.QtCore import Qt, QRegExp, QDate
+from qtpy.QtCore import Qt, QRegExp, QDate, QVariant
 from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
     QLabel, QLineEdit, QComboBox, QCalendarWidget, QTableWidget,
@@ -46,6 +46,10 @@ class ScoreBoard(QWidget):
     def path(self, value):
         self._path = value
 
+    @property
+    def games_filename(self):
+        return osp.join(self._path, "games.csv")
+
     def load_data(self):
         fn = self.loader.lineedit.edit.text()
         self.path = osp.dirname(fn)
@@ -57,16 +61,20 @@ class ScoreBoard(QWidget):
         self.tap2.combobox.addItems(players)
         self.tbp1.combobox.addItems(players)
         self.tbp2.combobox.addItems(players)
+        
+        # update games list view
+        self.load_games_from_file()
+        self.display_games()        
 
     def setup_page(self):
         board = self.create_page_board()
-        game = self.create_page_game()
-        rank = self.create_page_rank()
+        self.games_tbl = self.create_page_game()
+        self.ranks_tbl = self.create_page_rank()
 
         splt = QSplitter(Qt.Horizontal)
-        splt.addWidget(game)
+        splt.addWidget(self.games_tbl)
         splt.addWidget(board)
-        splt.addWidget(rank)
+        splt.addWidget(self.ranks_tbl)
         splt.setSizes([300, 100, 300])
 
         layout = QVBoxLayout()
@@ -116,7 +124,7 @@ class ScoreBoard(QWidget):
 
     def save_board_to_game(self):
         game = {}
-        game["date"] = self.cal_date.toString('MMMM d, yyyy')
+        game["date"] = self.cal_date.toString('yyyy-MM-dd')
         game["seqno"] = int(self.seqno.edit.text())
         game["tap1"] = self.tap1.combobox.currentText()
         game["tap2"] = self.tap2.combobox.currentText()
@@ -124,16 +132,33 @@ class ScoreBoard(QWidget):
         game["tbp2"] = self.tbp2.combobox.currentText()
         game["tas"] = int(self.tas.edit.text())
         game["tbs"] = int(self.tbs.edit.text())
-        key = game["date"] + ", " + str(game["seqno"])
+        if game["seqno"] > 99:
+            print("Too many games per day: {}".format(game["seqno"]))
+        key = game["date"] + "-" + "{:02d}".format(game["seqno"])
         self.games[key] = game
         print(key, self.games[key])
         self.save_games_to_file()
-        # todo update games list view
+        # update games list view
+        self.load_games_from_file()
+        self.display_games()
         # todo update players rank view
 
+    def display_games(self):
+        nrow, ncol = self.games_df.shape
+        # todo column width adjust with content
+        for row in range(nrow):
+            for col in range(ncol):
+                val = self.games_df.iloc[row].iloc[col]
+                cell = QTableWidgetItem()
+                cell.setText(str(val))
+                self.games_tbl.setItem(row, col, cell)
+
+    def load_games_from_file(self):
+        fn = self.games_filename
+        self.games_df = pd.read_csv(fn)
+        
     def save_games_to_file(self):
-        fn = "games.csv"
-        fn = osp.join(self.path, fn)
+        fn = self.games_filename
         df = pd.DataFrame.from_dict(self.games, orient='index')
         df.to_csv(fn, index = False)
 
@@ -294,6 +319,7 @@ def main():
     parser.add_argument("-p", "--path", type=str, help='path to scores')
     args = parser.parse_args()
     path = args.path
+    path = "C:/Users/xinfa/Documents/score" # for beta testing
 
     app = QApplication([])
     gui = ScoreBoard(path=path)
