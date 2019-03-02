@@ -218,13 +218,18 @@ class ScoreBoard(QWidget):
             pcell.setText(index)
             self.ranks_tbl.setItem(irow, 0, pcell)
             for icol in range(ncol):
+                cell = QTableWidgetItem()
                 val = row.iloc[icol]
+                #if icol in [0, 1]:
+                #    val = str(int(val))
+                #else:
+                #    val = "{0:.3f}".format(val)
+                #cell.setText(val)
                 if icol in [0, 1]:
-                    val = str(int(val))
+                    val = int(val)
                 else:
                     val = "{0:.3f}".format(val)
-                cell = QTableWidgetItem()
-                cell.setText(val)
+                cell.setData(Qt.EditRole, QVariant(val))
                 self.ranks_tbl.setItem(irow, icol+1, cell)
             irow += 1
 
