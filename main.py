@@ -15,7 +15,8 @@ from qtpy.compat import getopenfilename, getsavefilename
 from qtpy.QtCore import Qt, QRegExp, QDate
 from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
-    QLabel, QLineEdit, QComboBox, QDialog, QCalendarWidget)
+    QLabel, QLineEdit, QComboBox, QCalendarWidget, QTableWidget,
+    QTableWidgetItem, QSplitter)
 
 from qtpy import PYQT5
 if PYQT5:
@@ -24,11 +25,11 @@ else:
     APP_ICON = QIcon("images/shuttlecock.png")
 
 
-class ScoreBoard(QDialog):
+class ScoreBoard(QWidget):
     NAME = "League Scoreboard - 谁羽争锋"
 
     def __init__(self, path=None):
-        QDialog.__init__(self)
+        QWidget.__init__(self)
         self.setWindowTitle(self.NAME)
         self.setWindowIcon(APP_ICON)
         self.games = {}
@@ -58,20 +59,47 @@ class ScoreBoard(QDialog):
         self.tbp2.combobox.addItems(players)
 
     def setup_page(self):
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
-        
-        text = "Load players"
-        self.loader = self.create_browsefile(text)
+        board = self.create_page_board()
+        game = self.create_page_game()
+        rank = self.create_page_rank()
+
+        splt = QSplitter(Qt.Horizontal)
+        splt.addWidget(game)
+        splt.addWidget(board)
+        splt.addWidget(rank)
+        splt.setSizes([300, 100, 300])
+
+        layout = QVBoxLayout()
+        layout.addWidget(splt)
+        self.setLayout(layout)
+
+    def create_page_board(self):
+        layout = QVBoxLayout()
+        self.loader = self.create_browsefile("Load players")
         if self.path is not None:
             self.loader.lineedit.edit.setText(self.path)
-        self.layout.addWidget(self.loader)
-
+        layout.addWidget(self.loader)
         board = self.create_board()
-        self.layout.addWidget(board)
-        
+        layout.addWidget(board)
         calendar = self.create_calendar()
-        self.layout.addWidget(calendar)
+        layout.addWidget(calendar)
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        return widget
+        
+    def create_page_game(self):
+        widget = QTableWidget()
+        widget.setSortingEnabled(True)
+        widget.setRowCount(1000)
+        widget.setColumnCount(8)
+        return widget
+
+    def create_page_rank(self):
+        widget = QTableWidget()
+        widget.setSortingEnabled(True)
+        widget.setRowCount(20)
+        widget.setColumnCount(7)
+        return widget
 
     def create_calendar(self):
         cal = QCalendarWidget(self)
