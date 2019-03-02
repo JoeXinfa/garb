@@ -25,6 +25,8 @@ else:
     APP_ICON = QIcon("images/shuttlecock.png")
 
 
+GAME_LIST = ['Date', 'Seq', 'TAP1', 'TAP2', 'TBP1', 'TBP2', 'TAS', 'TBS']
+
 class ScoreBoard(QWidget):
     NAME = "League Scoreboard - 谁羽争锋"
 
@@ -32,7 +34,7 @@ class ScoreBoard(QWidget):
         QWidget.__init__(self)
         self.setWindowTitle(self.NAME)
         self.setWindowIcon(APP_ICON)
-        self.games = {}
+        self.games = None # pandas dataframe
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -62,7 +64,7 @@ class ScoreBoard(QWidget):
         self.tbp1.combobox.addItems(players)
         self.tbp2.combobox.addItems(players)
         
-        # update games list view
+        # load games and update games table
         self.load_games_from_file()
         self.display_games()        
 
@@ -133,44 +135,56 @@ class ScoreBoard(QWidget):
         pass
 
     def save_board_to_game(self):
-        game = {}
-        game["date"] = self.cal_date.toString('yyyy-MM-dd')
-        game["seqno"] = int(self.seqno.edit.text())
-        game["tap1"] = self.tap1.combobox.currentText()
-        game["tap2"] = self.tap2.combobox.currentText()
-        game["tbp1"] = self.tbp1.combobox.currentText()
-        game["tbp2"] = self.tbp2.combobox.currentText()
-        game["tas"] = int(self.tas.edit.text())
-        game["tbs"] = int(self.tbs.edit.text())
-        if game["seqno"] > 99:
-            print("Too many games per day: {}".format(game["seqno"]))
-        key = game["date"] + "-" + "{:02d}".format(game["seqno"])
-        self.games[key] = game
-        print(key, self.games[key])
+        date = self.cal_date.toString('yyyy-MM-dd')
+        seqno = int(self.seqno.edit.text())
+        tap1 = self.tap1.combobox.currentText()
+        tap2 = self.tap2.combobox.currentText()
+        tbp1 = self.tbp1.combobox.currentText()
+        tbp2 = self.tbp2.combobox.currentText()
+        tas = int(self.tas.edit.text())
+        tbs = int(self.tbs.edit.text())
+        if seqno > 99:
+            print("Too many games per day: {}".format(seqno))
+        
+        # TODO warn if this game already exist in self.games
+        game = pd.DataFrame([[date, seqno, tap1, tap2, tbp1, tbp2,
+            tas, tbs]], columns=GAME_LIST)
+        if self.games is None:
+            self.games = game
+        else:
+            self.games = self.games.append(game, ignore_index=True)
+        self.games = self.games.drop_duplicates(subset=GAME_LIST[:2],
+            keep='last')
+        
         self.save_games_to_file()
-        # update games list view
+        
+        # load games and update games table
         self.load_games_from_file()
         self.display_games()
+        
         # todo update players rank view
 
     def display_games(self):
-        nrow, ncol = self.games_df.shape
+        if self.games is None:
+            return
+        nrow, ncol = self.games.shape
         # todo column width adjust with content
         for row in range(nrow):
             for col in range(ncol):
-                val = self.games_df.iloc[row].iloc[col]
+                val = self.games.iloc[row].iloc[col]
                 cell = QTableWidgetItem()
                 cell.setText(str(val))
                 self.games_tbl.setItem(row, col, cell)
 
     def load_games_from_file(self):
         fn = self.games_filename
-        self.games_df = pd.read_csv(fn)
+        if osp.isfile(fn):
+            self.games = pd.read_csv(fn)
         
     def save_games_to_file(self):
         fn = self.games_filename
-        df = pd.DataFrame.from_dict(self.games, orient='index')
-        df.to_csv(fn, index = False)
+        #df = pd.DataFrame.from_dict(self.games, orient='index')
+        self.games.to_csv(fn, index = False)
 
     def create_board(self):
         game  = QLabel("Game ID   ")
