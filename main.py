@@ -27,6 +27,9 @@ else:
 
 GAME_LIST = ['Date', 'Seq', 'TAP1', 'TAP2', 'TBP1', 'TBP2', 'TAS', 'TBS']
 RANK_LIST = ['Player', 'Games', 'Points', 'PPG', 'Bonus', 'GPA']
+PLAYERS_FILENAME = "players.csv"
+GAMES_FILENAME = "games.csv"
+RANKS_FILENAME = "ranks.csv"
 
 class ScoreBoard(QWidget):
     NAME = "League Scoreboard - 谁羽争锋"
@@ -37,6 +40,8 @@ class ScoreBoard(QWidget):
         self.setWindowIcon(APP_ICON)
         self.games = None # pandas dataframe
         self.ranks = None # pandas dataframe
+        self.fn_players = None
+        self.fn_games = None
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -51,14 +56,11 @@ class ScoreBoard(QWidget):
     def path(self, value):
         self._path = value
 
-    @property
-    def games_filename(self):
-        return osp.join(self._path, "games.csv")
-
     def load_data(self):
-        fn = self.loader.lineedit.edit.text()
-        self.path = osp.dirname(fn)
-        self.players = pd.read_csv(fn)
+        self.fn_players = self.load_players.lineedit.edit.text()
+        if self.path is None:
+            self.path = osp.dirname(self.fn_players)
+        self.players = pd.read_csv(self.fn_players)
         print(self.players)
         
         players = list(self.players.Name)
@@ -68,6 +70,7 @@ class ScoreBoard(QWidget):
         self.tbp2.combobox.addItems(players)
         
         # load games and update games table
+        self.fn_games = self.load_games.lineedit.edit.text()
         self.load_games_from_file()
         self.display_games()
         self.update_ranks()
@@ -93,14 +96,27 @@ class ScoreBoard(QWidget):
         self.resize(width, height)
 
     def create_page_board(self):
-        self.loader = self.create_browsefile("Load players")
+        self.load_players = self.create_browsefile("Players file")
+        self.load_games = self.create_browsefile("Games file")
+        btn_load = QPushButton("Load files")
+        btn_load.clicked.connect(self.load_data)
         if self.path is not None:
-            self.loader.lineedit.edit.setText(self.path)
+            fn_players = osp.join(self.path, PLAYERS_FILENAME)
+            fn_games = osp.join(self.path, GAMES_FILENAME)
+            self.load_players.lineedit.edit.setText(fn_players)
+            self.load_games.lineedit.edit.setText(fn_games)
+        layout = QVBoxLayout()
+        layout.addWidget(self.load_players)
+        layout.addWidget(self.load_games)
+        layout.addWidget(btn_load)
+        wgt_load = QWidget()
+        wgt_load.setLayout(layout)
+
         board = self.create_board()
         calendar = self.create_calendar()
         
         splt = QSplitter(Qt.Vertical)
-        splt.addWidget(self.loader)
+        splt.addWidget(wgt_load)
         splt.addWidget(board)
         splt.addWidget(calendar)
         
@@ -252,12 +268,12 @@ class ScoreBoard(QWidget):
                 self.games_tbl.setItem(row, col, cell)
 
     def load_games_from_file(self):
-        fn = self.games_filename
+        fn = self.fn_games
         if osp.isfile(fn):
             self.games = pd.read_csv(fn)
         
     def save_games_to_file(self):
-        fn = self.games_filename
+        fn = self.fn_games
         #df = pd.DataFrame.from_dict(self.games, orient='index')
         self.games.to_csv(fn, index = False)
 
@@ -387,7 +403,7 @@ class ScoreBoard(QWidget):
             filename, _selfilter = getopenfilename(self, title, basedir, filters)
         if filename:
             edit.setText(filename)
-            self.load_data()
+            #self.load_data()
 
 
 _resource = {
@@ -416,7 +432,11 @@ def main():
     parser.add_argument("-p", "--path", type=str, help='path to scores')
     args = parser.parse_args()
     path = args.path
-    path = "C:/Users/xinfa/Documents/score" # for beta testing
+    
+    # for qhick beta testing
+    path = "C:/Users/xinfa/Documents/garb"
+    path = path.replace("/", os.sep)
+    print("User input path:", path)
 
     app = QApplication([])
     gui = ScoreBoard(path=path)
