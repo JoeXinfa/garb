@@ -69,6 +69,10 @@ class ScoreBoard(QWidget):
         print(self.players)
         
         players = list(self.players.Name)
+        self.tap1.combobox.clear()
+        self.tap2.combobox.clear()
+        self.tbp1.combobox.clear()
+        self.tbp2.combobox.clear()
         self.tap1.combobox.addItems(players)
         self.tap2.combobox.addItems(players)
         self.tbp1.combobox.addItems(players)
