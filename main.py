@@ -100,13 +100,24 @@ class ScoreBoard(QWidget):
     def create_chart(self):
         win = pg.PlotWidget()
         # create list of floats
-        y1 = np.linspace(0, 20, num=20)
+        y = np.linspace(0, 20, num=20)
         # create horizontal list
         x = np.arange(20)
         # create bar chart
-        bg1 = pg.BarGraphItem(x=x, height=y1, width=0.6, brush='r')
-        win.addItem(bg1)
+        self.bar_graph_item = pg.BarGraphItem(x=x, height=y, width=0.6, brush='r')
+        win.addItem(self.bar_graph_item)
         return win
+
+    def update_chart(self, col, order):
+        print("Sort column {} with order {}".format(col+1, order))
+        nplayer = self.players.shape[0] - 1
+        x = np.arange(1, nplayer+1)
+        y = self.ranks.iloc[:,col-1].values
+        y.sort() # numpy ascending order
+        #if order == 0: # AscendingOrder
+        if order == 1: # DescendingOrder
+            y = y[::-1] # reverse the sorted array
+        self.bar_graph_item.setOpts(x=x, height=y)
 
     def create_page_board(self):
         self.load_players = self.create_browsefile("Players file")
@@ -127,13 +138,13 @@ class ScoreBoard(QWidget):
 
         board = self.create_board()
         calendar = self.create_calendar()
-        self.chart = self.create_chart()
+        chart = self.create_chart()
         
         splt = QSplitter(Qt.Vertical)
         splt.addWidget(wgt_load)
         splt.addWidget(board)
         splt.addWidget(calendar)
-        splt.addWidget(self.chart)
+        splt.addWidget(chart)
         
         layout = QVBoxLayout()
         layout.addWidget(splt)
@@ -163,6 +174,7 @@ class ScoreBoard(QWidget):
         header = widget.horizontalHeader()
         for i in range(len(RANK_LIST)):
             header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
+        widget.horizontalHeader().sortIndicatorChanged.connect(self.update_chart)
         return widget
 
     def create_calendar(self):
@@ -272,6 +284,8 @@ class ScoreBoard(QWidget):
                 cell.setData(Qt.EditRole, QVariant(val))
                 self.ranks_tbl.setItem(irow, icol+1, cell)
             irow += 1
+        # Sort table by descending GPA
+        self.ranks_tbl.horizontalHeader().setSortIndicator(5, Qt.DescendingOrder)
 
     def display_games(self):
         if self.games is None:
