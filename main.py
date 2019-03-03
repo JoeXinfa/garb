@@ -64,7 +64,8 @@ class ScoreBoard(QWidget):
         self.fn_players = self.load_players.lineedit.edit.text()
         if self.path is None:
             self.path = osp.dirname(self.fn_players)
-        self.players = pd.read_csv(self.fn_players)
+        players = pd.read_csv(self.fn_players)
+        self.players = players.sort_values('Name')
         print(self.players)
         
         players = list(self.players.Name)
@@ -255,12 +256,13 @@ class ScoreBoard(QWidget):
             row['Bonus'] = row['Games'] * 0.01
             row['GPA'] = row['PPG'] + row['Bonus']
 
-        # Refresh display
-        self.display_ranks()
+        self.display_ranks() # refresh display
 
     def display_ranks(self):
         if self.ranks is None:
             return
+        # https://stackoverflow.com/questions/7960505/strange-qtablewidget-behavior-not-all-cells-populated-after-sorting-followed-b
+        self.ranks_tbl.setSortingEnabled(False)
         nrow, ncol = self.ranks.shape
         irow = 0
         for index, row in self.ranks.iterrows():
@@ -282,6 +284,7 @@ class ScoreBoard(QWidget):
                 cell.setData(Qt.EditRole, QVariant(val))
                 self.ranks_tbl.setItem(irow, icol+1, cell)
             irow += 1
+        self.ranks_tbl.setSortingEnabled(True)
         # Sort table by descending GPA
         #self.ranks_tbl.horizontalHeader().setSortIndicator(5, Qt.DescendingOrder)
 
@@ -347,10 +350,10 @@ class ScoreBoard(QWidget):
         btn_edit_game = QPushButton("Edit game")
         btn_edit_game.clicked.connect(self.edit_game)
         btn_edit_game.setEnabled(False)
-        btn_save_games = QPushButton("Save games to file")
-        btn_save_games.clicked.connect(self.save_games_to_file)
         btn_update_ranks = QPushButton("Update ranks")
         btn_update_ranks.clicked.connect(self.update_ranks)
+        btn_save_games = QPushButton("Save games to file")
+        btn_save_games.clicked.connect(self.save_games_to_file)
         btn_save_ranks = QPushButton("Save ranks to file")
         btn_save_ranks.clicked.connect(self.save_ranks_to_file)
         
@@ -375,8 +378,8 @@ class ScoreBoard(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(btn_add_game)
         hbox.addWidget(btn_edit_game)
-        hbox.addWidget(btn_save_games)
         hbox.addWidget(btn_update_ranks)
+        hbox.addWidget(btn_save_games)
         hbox.addWidget(btn_save_ranks)
         layout.addLayout(hbox)
         
