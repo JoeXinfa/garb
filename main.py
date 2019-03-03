@@ -219,8 +219,6 @@ class ScoreBoard(QWidget):
         # Add game to table for view
         self.add_game_to_table(game)
         
-        #self.update_ranks()
-
     def update_ranks(self):
         index = list(self.players.Name)
         index.remove('None')
@@ -351,6 +349,8 @@ class ScoreBoard(QWidget):
         btn_edit_game.setEnabled(False)
         btn_save_games = QPushButton("Save games to file")
         btn_save_games.clicked.connect(self.save_games_to_file)
+        btn_update_ranks = QPushButton("Update ranks")
+        btn_update_ranks.clicked.connect(self.update_ranks)
         btn_save_ranks = QPushButton("Save ranks to file")
         btn_save_ranks.clicked.connect(self.save_ranks_to_file)
         
@@ -376,6 +376,7 @@ class ScoreBoard(QWidget):
         hbox.addWidget(btn_add_game)
         hbox.addWidget(btn_edit_game)
         hbox.addWidget(btn_save_games)
+        hbox.addWidget(btn_update_ranks)
         hbox.addWidget(btn_save_ranks)
         layout.addLayout(hbox)
         
