@@ -1,32 +1,9 @@
-use anonymous names, commit test data
-
-take demo snapshot, commit
-
-add readme, why make this, 1) efficient 2) less error than excel
-excel vs python
-
-Change name Yang Li to Will Li, add column of Chinese names
-
-Name it, Games Automatic Ranking for Badminton, or GARB
-
-share code with Will and Xuepei
-send pic to Yanan
-
-ranks table, one click to sort by descending (not ascending)
-
-
-save game, add or modify only that entry, rather than refill the whole table
-test speed, make it faster
-
-Add a plot or pie chart for games, points, etc. in the ranks table
-
-save ranks to ranks.csv
-
-User can directly type in the games table to add, edit, save file, rank refresh
 
 Ranks in a period of time or by month
 
-Make ranks table cell not user editable, only update by program
+ranks table, one click to sort by descending (not ascending)
+
+button switch between, english name, alias name
 
 Make a web-based app, user can use from web browser via internet
 
