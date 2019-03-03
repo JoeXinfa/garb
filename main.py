@@ -242,14 +242,18 @@ class ScoreBoard(QWidget):
             tap2 = row['TAP2']
             tbp1 = row['TBP1']
             tbp2 = row['TBP2']
-            self.ranks.loc[tap1].loc['Games'] += 1
-            self.ranks.loc[tap2].loc['Games'] += 1
-            self.ranks.loc[tbp1].loc['Games'] += 1
-            self.ranks.loc[tbp2].loc['Games'] += 1
-            self.ranks.loc[tap1].loc['Points'] += pointa
-            self.ranks.loc[tap2].loc['Points'] += pointa
-            self.ranks.loc[tbp1].loc['Points'] += pointb
-            self.ranks.loc[tbp2].loc['Points'] += pointb
+            if tap1 != 'None':
+                self.ranks.loc[tap1].loc['Games'] += 1
+                self.ranks.loc[tap1].loc['Points'] += pointa
+            if tap2 != 'None':
+                self.ranks.loc[tap2].loc['Games'] += 1
+                self.ranks.loc[tap2].loc['Points'] += pointa
+            if tbp1 != 'None':
+                self.ranks.loc[tbp1].loc['Games'] += 1
+                self.ranks.loc[tbp1].loc['Points'] += pointb
+            if tbp2 != 'None':
+                self.ranks.loc[tbp2].loc['Games'] += 1
+                self.ranks.loc[tbp2].loc['Points'] += pointb
 
         # Calculate PPG, Bonus, and GPA
         for index, row in self.ranks.iterrows():
