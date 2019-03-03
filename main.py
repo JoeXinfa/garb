@@ -11,6 +11,7 @@ import os.path as osp
 import numpy as np
 import pandas as pd
 import qtawesome as qta
+import pyqtgraph as pg
 from qtpy.compat import getopenfilename, getsavefilename
 from qtpy.QtCore import Qt, QRegExp, QDate, QVariant
 from qtpy.QtGui import QRegExpValidator, QIcon
@@ -77,7 +78,7 @@ class ScoreBoard(QWidget):
         self.update_ranks()
 
     def setup_page(self):
-        width, height = 1500, 500
+        width, height = 1500, 600
         board = self.create_page_board()
         self.games_tbl = self.create_page_game()
         self.ranks_tbl = self.create_page_rank()
@@ -95,6 +96,17 @@ class ScoreBoard(QWidget):
         self.setLayout(layout)
         
         self.resize(width, height)
+
+    def create_chart(self):
+        win = pg.PlotWidget()
+        # create list of floats
+        y1 = np.linspace(0, 20, num=20)
+        # create horizontal list
+        x = np.arange(20)
+        # create bar chart
+        bg1 = pg.BarGraphItem(x=x, height=y1, width=0.6, brush='r')
+        win.addItem(bg1)
+        return win
 
     def create_page_board(self):
         self.load_players = self.create_browsefile("Players file")
@@ -115,11 +127,13 @@ class ScoreBoard(QWidget):
 
         board = self.create_board()
         calendar = self.create_calendar()
+        self.chart = self.create_chart()
         
         splt = QSplitter(Qt.Vertical)
         splt.addWidget(wgt_load)
         splt.addWidget(board)
         splt.addWidget(calendar)
+        splt.addWidget(self.chart)
         
         layout = QVBoxLayout()
         layout.addWidget(splt)
