@@ -90,15 +90,19 @@ class ScoreBoard(QWidget):
         self.resize(width, height)
 
     def create_page_board(self):
-        layout = QVBoxLayout()
         self.loader = self.create_browsefile("Load players")
         if self.path is not None:
             self.loader.lineedit.edit.setText(self.path)
-        layout.addWidget(self.loader)
         board = self.create_board()
-        layout.addWidget(board)
         calendar = self.create_calendar()
-        layout.addWidget(calendar)
+        
+        splt = QSplitter(Qt.Vertical)
+        splt.addWidget(self.loader)
+        splt.addWidget(board)
+        splt.addWidget(calendar)
+        
+        layout = QVBoxLayout()
+        layout.addWidget(splt)
         widget = QWidget(self)
         widget.setLayout(layout)
         return widget
