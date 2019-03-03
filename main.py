@@ -265,9 +265,14 @@ class ScoreBoard(QWidget):
         nrow, ncol = self.games.shape
         for row in range(nrow):
             for col in range(ncol):
-                val = self.games.iloc[row].iloc[col]
                 cell = QTableWidgetItem()
-                cell.setText(str(val))
+                val = self.games.iloc[row].iloc[col]
+                if col in [1, 6, 7]:
+                    val = int(val)
+                    cell.setData(Qt.EditRole, QVariant(val))
+                else:
+                    val = str(val)
+                    cell.setText(val)
                 self.games_tbl.setItem(row, col, cell)
 
     def load_games_from_file(self):
