@@ -44,6 +44,8 @@ class ScoreBoard(QWidget):
         self.ranks = None # pandas dataframe
         self.fn_players = None
         self.fn_games = None
+        self.rank_order = 1 # descending
+        self.rank_column = 1
         if path is None:
             path = os.getcwd()
         self.path = path
@@ -109,6 +111,8 @@ class ScoreBoard(QWidget):
         return win
 
     def update_chart(self, col, order):
+        self.rank_column = col
+        self.rank_order = order
         print("Sort column {} with order {}".format(col+1, order))
         nplayer = self.players.shape[0] - 1
         x = np.arange(1, nplayer+1)
@@ -187,10 +191,10 @@ class ScoreBoard(QWidget):
         self.cal_date = date
         self.date.edit.setText(date.toString())
 
-    def load_game_to_board(self):
-        pass
-
     def save_board_to_game(self):
+        pass
+    
+    def add_game(self):
         date = self.cal_date.toString('yyyy-MM-dd')
         seqno = int(self.seqno.edit.text())
         tap1 = self.tap1.combobox.currentText()
@@ -201,25 +205,28 @@ class ScoreBoard(QWidget):
         tbs = int(self.tbs.edit.text())
         if seqno > 99:
             print("Too many games per day: {}".format(seqno))
-        
-        # TODO warn if this game already exist in self.games
         game = pd.DataFrame([[date, seqno, tap1, tap2, tbp1, tbp2,
             tas, tbs]], columns=GAME_LIST)
+        # Add game to database
+        # TODO warn if this game already exist in self.games
         if self.games is None:
             self.games = game
         else:
             self.games = self.games.append(game, ignore_index=True)
-        self.games = self.games.drop_duplicates(subset=GAME_LIST[:2],
-            keep='last')
+        # Add game to table for view
+        self.add_game_to_table(game)
         
-        self.save_games_to_file()
+        #self.games = self.games.drop_duplicates(subset=GAME_LIST[:2],
+        #    keep='last')
+
+        #self.save_games_to_file()
         
         # load games and update games table
-        self.load_games_from_file()
-        self.display_games()
+        #self.load_games_from_file()
+        #self.display_games()
         # TODO reset all cells or just the one game?
         
-        self.update_ranks()
+        #self.update_ranks()
 
     def update_ranks(self):
         index = list(self.players.Name)
@@ -285,7 +292,22 @@ class ScoreBoard(QWidget):
                 self.ranks_tbl.setItem(irow, icol+1, cell)
             irow += 1
         # Sort table by descending GPA
-        self.ranks_tbl.horizontalHeader().setSortIndicator(5, Qt.DescendingOrder)
+        #self.ranks_tbl.horizontalHeader().setSortIndicator(5, Qt.DescendingOrder)
+
+    def add_game_to_table(self, game):
+        """ Append a row at bottom of the table for this game """
+        nrow, ncol = self.games.shape
+        print("Add game to row {}".format(nrow))
+        for col in range(ncol):
+            cell = QTableWidgetItem()
+            val = game.iloc[0].iloc[col]
+            if col in [1, 6, 7]:
+                val = int(val)
+                cell.setData(Qt.EditRole, QVariant(val))
+            else:
+                val = str(val)
+                cell.setText(val)
+            self.games_tbl.setItem(nrow-1, col, cell)
 
     def display_games(self):
         if self.games is None:
@@ -329,11 +351,11 @@ class ScoreBoard(QWidget):
         self.tap2 = self.create_combobox("Player 2")
         self.tbp1 = self.create_combobox("Player 1")
         self.tbp2 = self.create_combobox("Player 2")
-        btn_load = QPushButton("Load game")
-        btn_load.clicked.connect(self.load_game_to_board)
+        btn_add_game = QPushButton("Add game")
+        btn_add_game.clicked.connect(self.add_game)
         btn_save = QPushButton("Save game")
         btn_save.clicked.connect(self.save_board_to_game)
-        btn_save_ranks = QPushButton("Save ranks")
+        btn_save_ranks = QPushButton("Save ranks to file")
         btn_save_ranks.clicked.connect(self.save_ranks_to_file)
         
         layout = QVBoxLayout()
@@ -355,7 +377,7 @@ class ScoreBoard(QWidget):
         hbox.addWidget(self.tbs)
         layout.addLayout(hbox)
         hbox = QHBoxLayout()
-        hbox.addWidget(btn_load)
+        hbox.addWidget(btn_add_game)
         hbox.addWidget(btn_save)
         hbox.addWidget(btn_save_ranks)
         layout.addLayout(hbox)
