@@ -283,7 +283,11 @@ class ScoreBoard(QWidget):
     def save_games_to_file(self):
         fn = self.fn_games
         #df = pd.DataFrame.from_dict(self.games, orient='index')
-        self.games.to_csv(fn, index = False)
+        self.games.to_csv(fn, index=False)
+
+    def save_ranks_to_file(self):
+        fn = osp.join(osp.dirname(self.fn_games), RANKS_FILENAME)
+        self.ranks.to_csv(fn, index=True)
 
     def create_board(self):
         game  = QLabel("Game ID   ")
@@ -297,10 +301,12 @@ class ScoreBoard(QWidget):
         self.tap2 = self.create_combobox("Player 2")
         self.tbp1 = self.create_combobox("Player 1")
         self.tbp2 = self.create_combobox("Player 2")
-        btn_load = QPushButton("Load")
+        btn_load = QPushButton("Load game")
         btn_load.clicked.connect(self.load_game_to_board)
-        btn_save = QPushButton("Save")
+        btn_save = QPushButton("Save game")
         btn_save.clicked.connect(self.save_board_to_game)
+        btn_save_ranks = QPushButton("Save ranks")
+        btn_save_ranks.clicked.connect(self.save_ranks_to_file)
         
         layout = QVBoxLayout()
         hbox = QHBoxLayout()
@@ -323,6 +329,7 @@ class ScoreBoard(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(btn_load)
         hbox.addWidget(btn_save)
+        hbox.addWidget(btn_save_ranks)
         layout.addLayout(hbox)
         
         board = QWidget(self)
