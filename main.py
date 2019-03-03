@@ -16,7 +16,7 @@ from qtpy.QtCore import Qt, QRegExp, QDate, QVariant
 from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
     QLabel, QLineEdit, QComboBox, QCalendarWidget, QTableWidget,
-    QTableWidgetItem, QSplitter, QHeaderView)
+    QTableWidgetItem, QSplitter, QHeaderView, QApplication, QStyleFactory)
 
 from qtpy import PYQT5
 if PYQT5:
@@ -41,6 +41,7 @@ class ScoreBoard(QWidget):
             path = os.getcwd()
         self.path = path
         self.setup_page()
+        QApplication.setStyle(QStyleFactory.create('Cleanlooks'))
 
     @property
     def path(self):
@@ -82,6 +83,8 @@ class ScoreBoard(QWidget):
         splt.addWidget(board)
         splt.addWidget(self.ranks_tbl)
         splt.setSizes([700, 300, 500])
+        #splt.setHandleWidth(10)
+        splt.setStyleSheet("QSplitter::handle { background-color: rgb(0, 255, 0); }")
 
         layout = QVBoxLayout()
         layout.addWidget(splt)
@@ -409,8 +412,6 @@ def icon(name, resample=False, icon_path=None):
 
 def main():
     import argparse
-    from qtpy.QtWidgets import QApplication
-
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--path", type=str, help='path to scores')
     args = parser.parse_args()

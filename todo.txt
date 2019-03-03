@@ -1,14 +1,19 @@
-ranks table, one click to sort by descending (not ascending)
-
 use anonymous names, commit test data
 
 take demo snapshot, commit
 
 add readme, why make this, 1) efficient 2) less error than excel
-
-share code with Will and Xuepei
+excel vs python
 
 Change name Yang Li to Will Li, add column of Chinese names
+
+Name it, Games Automatic Ranking for Badminton, or GARB
+
+share code with Will and Xuepei
+send pic to Yanan
+
+ranks table, one click to sort by descending (not ascending)
+
 
 save game, add or modify only that entry, rather than refill the whole table
 test speed, make it faster
