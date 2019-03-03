@@ -16,7 +16,8 @@ from qtpy.QtCore import Qt, QRegExp, QDate, QVariant
 from qtpy.QtGui import QRegExpValidator, QIcon
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QHBoxLayout,
     QLabel, QLineEdit, QComboBox, QCalendarWidget, QTableWidget,
-    QTableWidgetItem, QSplitter, QHeaderView, QApplication, QStyleFactory)
+    QTableWidgetItem, QSplitter, QHeaderView, QApplication, QStyleFactory,
+    QAbstractItemView)
 
 from qtpy import PYQT5
 if PYQT5:
@@ -128,6 +129,7 @@ class ScoreBoard(QWidget):
         
     def create_page_game(self):
         widget = QTableWidget()
+        widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         widget.setSortingEnabled(True)
         widget.setRowCount(1000)
         widget.setColumnCount(len(GAME_LIST))
@@ -139,6 +141,7 @@ class ScoreBoard(QWidget):
 
     def create_page_rank(self):
         widget = QTableWidget()
+        widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         widget.setSortingEnabled(True)
         widget.setRowCount(20)
         widget.setColumnCount(len(RANK_LIST))
@@ -434,7 +437,7 @@ def main():
     path = args.path
     
     # for qhick beta testing
-    path = "C:/Users/xinfa/Documents/garb"
+    path = "C:/Users/xinfa/Documents/league/garb"
     path = path.replace("/", os.sep)
     print("User input path:", path)
 
