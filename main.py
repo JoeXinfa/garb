@@ -32,7 +32,7 @@ GAMES_FILENAME = "games.csv"
 RANKS_FILENAME = "ranks.csv"
 
 class ScoreBoard(QWidget):
-    NAME = "League Scoreboard - 谁羽争锋"
+    NAME = "Games Automatic Ranking for Badminton (GARB) - 谁羽争锋"
 
     def __init__(self, path=None):
         QWidget.__init__(self)
