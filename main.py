@@ -191,8 +191,11 @@ class ScoreBoard(QWidget):
         self.cal_date = date
         self.date.edit.setText(date.toString())
 
-    def save_board_to_game(self):
+    def edit_game(self):
+        """ Edit an existing game in the table """
         pass
+        #self.games = self.games.drop_duplicates(subset=GAME_LIST[:2],
+        #    keep='last')
     
     def add_game(self):
         date = self.cal_date.toString('yyyy-MM-dd')
@@ -215,16 +218,6 @@ class ScoreBoard(QWidget):
             self.games = self.games.append(game, ignore_index=True)
         # Add game to table for view
         self.add_game_to_table(game)
-        
-        #self.games = self.games.drop_duplicates(subset=GAME_LIST[:2],
-        #    keep='last')
-
-        #self.save_games_to_file()
-        
-        # load games and update games table
-        #self.load_games_from_file()
-        #self.display_games()
-        # TODO reset all cells or just the one game?
         
         #self.update_ranks()
 
@@ -353,8 +346,11 @@ class ScoreBoard(QWidget):
         self.tbp2 = self.create_combobox("Player 2")
         btn_add_game = QPushButton("Add game")
         btn_add_game.clicked.connect(self.add_game)
-        btn_save = QPushButton("Save game")
-        btn_save.clicked.connect(self.save_board_to_game)
+        btn_edit_game = QPushButton("Edit game")
+        btn_edit_game.clicked.connect(self.edit_game)
+        btn_edit_game.setEnabled(False)
+        btn_save_games = QPushButton("Save games to file")
+        btn_save_games.clicked.connect(self.save_games_to_file)
         btn_save_ranks = QPushButton("Save ranks to file")
         btn_save_ranks.clicked.connect(self.save_ranks_to_file)
         
@@ -378,7 +374,8 @@ class ScoreBoard(QWidget):
         layout.addLayout(hbox)
         hbox = QHBoxLayout()
         hbox.addWidget(btn_add_game)
-        hbox.addWidget(btn_save)
+        hbox.addWidget(btn_edit_game)
+        hbox.addWidget(btn_save_games)
         hbox.addWidget(btn_save_ranks)
         layout.addLayout(hbox)
         
