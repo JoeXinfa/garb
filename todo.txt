@@ -1,4 +1,9 @@
 
+1 board pane to left, games and ranks tables together for snapshot
+2 complete edit function
+3 board pane can collapse, save space for the other two tables
+4 add legend of name to the plot (only top 3)
+
 Ranks in a period of time or by month
 
 ranks table, one click to sort by descending (not ascending)
