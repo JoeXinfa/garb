@@ -1,4 +1,6 @@
 
+add random draw to match up partners for games
+
 1 board pane to left, games and ranks tables together for snapshot
 2 complete edit function
 3 board pane can collapse, save space for the other two tables
@@ -13,3 +15,5 @@ button switch between, english name, alias name
 Make a web-based app, user can use from web browser via internet
 
 Jim Li suggestions
+split groups A,B,C, player in A can drop to B, player in B can upgrade to A, encourage competition
+A wins A get x points, A wins B get y points, y < x
