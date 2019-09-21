@@ -1,0 +1,25 @@
+1) Install Python and dependencies
+    Option 1 is Anaconda. You can also use pip.
+    Dependent packages include Pandas, Qtawesome, PyQtGraph, PyQt.
+
+2) Prepare data files
+    Say working directory is /path/to/rong
+    Create players.csv file, e.g. /path/to/garb/examples/players.csv
+
+3) Launch
+    python /path/to/garb/main.py -p /path/to/rong
+    For Mac or Linux, create an alias in ~/.bashrc
+    For Windows, create a shortcut
+
+4) Start use
+    Click 'Load files'
+    Click a date in the calendar
+    Type a sequence number in 'Seqno'
+    Select players and type in 'Score'
+    Click 'Add game'
+    Click 'Update ranks'
+    Click 'Save games to file'
+    Click the 'x' to exit
+
+If you made a type in an added game, I recommend you edit the games.csv
+using any text editor you like.
