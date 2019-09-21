@@ -506,10 +506,9 @@ def main():
     parser.add_argument("-p", "--path", type=str, help='path to scores')
     args = parser.parse_args()
     path = args.path
-    
     # for qhick beta testing
-    path = "C:/Users/xinfa/Documents/league/garb"
-    path = path.replace("/", os.sep)
+    #path = "C:/Users/xinfa/Documents/league/garb"
+    #path = path.replace("/", os.sep)
     print("User input path:", path)
 
     app = QApplication([])
