@@ -226,13 +226,16 @@ class ScoreBoard(QWidget):
         
     def update_ranks(self):
         index = list(self.players.Name)
-        index.remove('None')
+        if 'None' in index:
+            index.remove('None')
         columns = RANK_LIST[1:]
         nrow, ncol = len(index), len(columns)
         data = np.zeros((nrow, ncol))
         self.ranks = pd.DataFrame(data, index=index, columns=columns)
 
         # Count number of games and points
+        if self.games is None:
+            return
         for index, row in self.games.iterrows():
             if row['TAS'] > row['TBS']:
                 pointa, pointb = 2, 1
