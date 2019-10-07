@@ -1,4 +1,9 @@
 
+Edit game
+Think unique game ID is date and seqno
+Click a game in the game table, data show in the central board, make some change, add game. 1) If date or seqno changed, add a new game. 2) If date and seqno not changed, warn, update existing game.
+Remove the gray-out Edit game button
+
 add random draw to match up partners for games
 
 1 board pane to left, games and ranks tables together for snapshot

@@ -4,7 +4,8 @@
 
 2) Prepare data files
     Say working directory is /path/to/rong
-    Create players.csv file, e.g. /path/to/garb/examples/players.csv
+    Create /path/to/rong/players.csv file, an example file is here
+    ../examples/players.csv
 
 3) Launch
     python /path/to/garb/main.py -p /path/to/rong
@@ -21,5 +22,5 @@
     Click 'Save games to file'
     Click the 'x' to exit
 
-If you made a type in an added game, I recommend you edit the games.csv
+If you made a typo in an added game, I recommend you edit the games.csv
 using any text editor you like.
