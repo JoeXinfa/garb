@@ -1,4 +1,8 @@
 
+simplify table widget
+use pandas dataframe to model to table view
+https://stackoverflow.com/questions/31475965/fastest-way-to-populate-qtableview-from-pandas-data-frame
+
 Edit game
 Think unique game ID is date and seqno
 Click a game in the game table, data show in the central board, make some change, add game. 1) If date or seqno changed, add a new game. 2) If date and seqno not changed, warn, update existing game.
